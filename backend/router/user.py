@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 
 from core.security import get_current_user
 from schemas.user import UserCreate, UserResponse
-from models.users import User as UserModel
+from backend.models.user import User as UserModel
 
 from db.database import get_db
 

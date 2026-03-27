@@ -10,7 +10,7 @@ from jwt.exceptions import InvalidTokenError
 
 from core.config import settings
 from schemas.auth import TokenData
-from models.users import User as UserModel
+from backend.models.user import User as UserModel
 from db.database import get_db
 
 REFRESH_TOKEN_EXPIRE_MINUTES = 6 * 24 * 7
