@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from models.user import User as UserModel
 from schemas.recipe import (
-    IngredientCreate, IngredientResponse, InstructionCreate, InstructionResponse, RecipeCreate, RecipeResponse
+    CuisineCreate, CuisineResponse, IngredientCreate, IngredientResponse, InstructionCreate, InstructionResponse, RecipeCreate, RecipeResponse
 )
 from models.recipe import (
     Ingredient,
@@ -37,7 +37,7 @@ def create_ingredient(request: IngredientCreate, db: Session=Depends(get_db)) ->
 # ===============================================================================================
 # CREATE INSTRUCTION
 # ===============================================================================================
-
+@router.post("/add_instruction", response_model=InstructionResponse)
 def create_instruction(request: InstructionCreate, db: Session=Depends(get_db)) -> InstructionResponse:
     db_instruction = db.query(Instruction).filter(Instruction.instruction == request.instruction).first()
     if db_instruction:
@@ -50,15 +50,16 @@ def create_instruction(request: InstructionCreate, db: Session=Depends(get_db)) 
 # ===============================================================================================
 # CREATE CUISINE
 # ===============================================================================================
-# def create_cuisine(request: CuisineCreate, db: Session=Depends(get_db)) -> CuisineResponse:
-#     db_cuisine = db.query(Cuisine).filter(Cuisine.name == request.name).first()
-#     if db_cuisine:
-#         raise HTTPException(status_code=400)
-#     new_cuisine = Cuisine(**request.model_dump())
-#     db.add(new_cuisine)
-#     db.commit()
-#     db.refresh(new_cuisine)
-#     return new_cuisine
+@router.post("/add_cuisine", response_model=CuisineResponse)
+def create_cuisine(request: CuisineCreate, db: Session=Depends(get_db)) -> CuisineResponse:
+    db_cuisine = db.query(Cuisine).filter(Cuisine.name == request.name).first()
+    if db_cuisine:
+        raise HTTPException(status_code=400)
+    new_cuisine = Cuisine(**request.model_dump())
+    db.add(new_cuisine)
+    db.commit()
+    db.refresh(new_cuisine)
+    return new_cuisine
 # ===============================================================================================
 # CREATE RECIPE
 # ===============================================================================================
@@ -133,4 +134,41 @@ def get_recipe_for_user(user_id: int, recipe_id: int, db: Session = Depends(get_
     if not recipe:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Recipe not found for this user")
     
+    return recipe
+
+# ===============================================================================================
+# UPDATE RECIPE FOR USER
+# ===============================================================================================
+@router.put("/users/{user_id}/recipes/{recipe_id}", response_model=RecipeResponse)
+def update_recipe(user_id: int, recipe_id: int, request: RecipeCreate, db: Session = Depends(get_db)) ->Recipe:
+    recipe: Recipe = db.query(Recipe).filter(Recipe.user_id == user_id, Recipe.id == recipe_id).first()
+    if not recipe: 
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Recipe not found for this user")
+    
+    recipe.name = request.name,
+    recipe.description = request.description,
+    recipe.cook_time = request.cook_time,
+    recipe.prep_time = request.prep_time,
+    recipe.calories = request.calories,
+    recipe.image = request.image,
+    recipe.dietary = request.dietary,
+    recipe.servings = request.servings,
+    recipe.cuisine=Cuisine(name=request.cuisine.name),
+    recipe.user_id=user_id,
+    recipe.ingredients=[
+        Ingredient(
+            name=i.name,
+            measurements=i.measurements,
+            units=i.units
+        )
+        for i in request.ingredients
+    ],
+    recipe.instructions=[
+        Instruction(
+            step=i.step,
+            instruction=i.instruction,
+        )
+        for i in request.instructions
+    ]
+    db.commit()
     return recipe
