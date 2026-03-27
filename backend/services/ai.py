@@ -1,7 +1,7 @@
 import os
 from openai import OpenAI
 from dotenv import load_dotenv
-from backend.schemas.ai import AIRecipeGenerateRequest
+from schemas.ai import AIRecipeGenerateRequest
 from core.config import settings
 
 SYSTEM_PROMPT =  """You are a world-class master chef with deep knowledge of all global cuisines. Generate high-quality, realistic recipes.

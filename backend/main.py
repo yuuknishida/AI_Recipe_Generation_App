@@ -6,6 +6,7 @@ from db.database import create_tables
 from router.user import router as user_router
 from router.recipe import router as recipe_router
 from router.auth import router as auth_router
+from router.ai import router as ai_router
 
 app = FastAPI(
     title="DishCraft",
@@ -22,6 +23,7 @@ create_tables()
 app.include_router(user_router)
 app.include_router(recipe_router)
 app.include_router(auth_router)
+app.include_router(ai_router)
 
 app.add_middleware(
     CORSMiddleware,
