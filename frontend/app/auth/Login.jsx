@@ -13,20 +13,8 @@ export default function Login() {
     const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	
-	useEffect(() => {
-		fetch("http://localhost:8000/auth/login")
-			.then(response => {
-				if (response.ok) {
-					return response.json()
-				}
-				throw response;
-			})
-			.then(data => {
-				setEmail(data.email);
-				setPassword(data.password);
-			});
-	}, []);
 	
+
     return (
         <View style={styles.container}>
             <AuthHeader
