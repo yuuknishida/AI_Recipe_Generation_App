@@ -15,13 +15,7 @@ app = FastAPI(
     redoc_url="/redoc",
 )
 
-# CREATE DATABASE TABLES
-create_tables()
 
-# TODO: ADD APP ROUTES HERE
-app.include_router(user_router)
-app.include_router(recipe_router)
-app.include_router(auth_router)
 
 app.add_middleware(
     CORSMiddleware,
@@ -30,6 +24,14 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# CREATE DATABASE TABLES
+create_tables()
+
+# TODO: ADD APP ROUTES HERE
+app.include_router(user_router)
+app.include_router(recipe_router)
+app.include_router(auth_router)
 
 if __name__ == "__main__":
     import uvicorn

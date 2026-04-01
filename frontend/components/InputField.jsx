@@ -33,7 +33,7 @@ const styles = StyleSheet.create({
 		marginBottom: 15,
 		backgroundColor: "#fff",
 		fontSize: 16,
-        color: '#fff',
+        color: '#4d4d4d',
     },
     label: {
         color: '#fff',

@@ -1,4 +1,4 @@
-import { TouchableOpacity, View, Text, StyleSheet } from 'react-native';
+import { TouchableOpacity, View, Text, StyleSheet, Alert } from 'react-native';
 import { useState } from "react";
 import { useRouter } from 'expo-router';
 import AuthHeader from '../../components/AuthHeader';
@@ -6,12 +6,50 @@ import InputField from '../../components/InputField';
 
 export default function Register() {
     const router = useRouter();
+    const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
+
+    const handleRegister = async () => {
+        if (!name || !email || !password || !confirmPassword) {
+            Alert.alert("Error", "Please fill in all fields.");
+            return;
+        }
+        if (password !== confirmPassword) {
+            Alert.alert("Error", "Passwords do not match.");
+            return;
+        }
+
+        try {
+            const response = await fetch("http://localhost:8000/auth/register", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name, email, password }),
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                Alert.alert("Registration Failed", error.detail || "Something went wrong.");
+                return;
+            }
+            router.push("/auth/Login");
+        } catch (err) {
+            Alert.alert("Error", "Could not connect to the server.");
+            console.error("Error: ", err);
+        }
+    };
+
     return (
         <View style={styles.container}>
             <AuthHeader title='Register Here' subtitle='Start your cooking journey today'></AuthHeader>
+
+            <InputField
+                label="Full Name"
+                placeholder="Full Name"
+                value={name}
+                onChangeText={setName}
+            />
 
             <InputField
                 label="Email"
@@ -32,7 +70,7 @@ export default function Register() {
                 value={confirmPassword}
                 onChangeText={setConfirmPassword}
             ></InputField>
-            <TouchableOpacity style={styles.button}>
+            <TouchableOpacity style={styles.button} onPress={handleRegister}>
                 <Text style={styles.buttonText}>Register</Text>
             </TouchableOpacity>
             <View style={{
